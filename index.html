@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>FZen.Control - Calculateurs Financiers</title>
+    <link rel="stylesheet" href="/CSS/style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav id="sidebar">
+            <div class="logo"><img src="/IMAGES/Gemini_Generated_Image_3z6jdc3z6jdc3z6j-removebg-preview.png" alt=""
+                    style="width: 200px;"></div>
+            <div class="nav-group">
+                <a href="/index.html" class="nav-item active">Accueil</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-label">Indépendants</div>
+                <a class="nav-item" href="/PAGES/freelance.html"><span class="nav-text">Auto-Entrepreneur</span></a>
+                <a class="nav-item" href="/PAGES/tjm.html"><span class="nav-text">Calcul TJM</span></a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-label">Finance & Patrimoine</div>
+                <a class="nav-item" href="/PAGES/immo.html"><span class="nav-text">Immobilier Locatif</span></a>
+                <a class="nav-item" href="/PAGES/pret.html"><span class="nav-text">Prêt & Crédit</span></a>
+                <a class="nav-item" href="/PAGES/epargne.html"><span class="nav-text">Épargne & Retraite</span></a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-label">Vie Professionnelle</div>
+                <a class="nav-item" href="/PAGES/salaire.html"><span class="nav-text">Brut → Net</span></a>
+                <a class="nav-item" href="/PAGES/ecommerce.html"><span class="nav-text">E-commerce / Marge</span></a>
+                
+            </div>
+            <div class="nav-group">
+                <div class="nav-label">Fiscalité & Santé</div>
+                <a class="nav-item" href="/PAGES/impot.html"><span class="nav-text">Impôt sur le Revenu</span></a>
+                <a class="nav-item" href="/PAGES/sante.html"><span class="nav-text">Santé & Mutuelle</span></a>
+            </div>
+
+        </nav>
+    </header>
+
+    <div class="container">
+        <img src="/IMAGES/Gemini_Generated_Image_3z6jdc3z6jdc3z6j-removebg-preview.png" alt=""
+            style="width: 400px; margin: auto; display: block; margin-bottom: 1rem;">
+        <main class="main-content">
+
+            <div class="card">
+                <h2>Indépendants</h2>
+                <a href="/PAGES/freelance.html" class="btn">Auto-Entrepreneur</a>
+                <a href="/PAGES/tjm.html" class="btn">Calcul TJM</a>
+            </div>
+
+            <div class="card">
+                <h2>Finance & Patrimoine</h2>
+                <a href="/PAGES/immo.html" class="btn">Immobilier Locatif</a>
+                <a href="/PAGES/pret.html" class="btn">Prêt & Crédit</a>
+                <a href="/PAGES/epargne.html" class="btn">Épargne & Retraite</a>
+            </div>
+
+            <div class="card">
+                <h2>Vie Professionnelle</h2>
+                <a href="/PAGES/salaire.html" class="btn">Brut → Net</a>
+                <a href="/PAGES/ecommerce.html" class="btn">E-commerce / Marge</a>
+             
+            </div>
+
+            <div class="card">
+                <h2>Fiscalité & Santé</h2>
+                <a href="/PAGES/impot.html" class="btn">Impôt sur le Revenu</a>
+                <a href="/PAGES/sante.html" class="btn">Santé & Mutuelle</a>
+            </div>
+
+        </main>
+        <footer class="sidebar-footer">
+            <div class="footer-text">© 2024 FZen.Control</div>
+        </footer>
+    </div>
+    <style>
+
+
+        .main-content {
+            margin: auto;
+            gap: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            padding: 2rem;
+            width: 280px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--primary, #007bff);
+            font-size: 1.3rem;
+        }
+
+        .btn {
+            display: block;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: #fff;
+            padding: 0.75rem 1.25rem;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+        }
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+</body>
+
+</html>

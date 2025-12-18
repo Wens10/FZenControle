@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Calculateur Freelance - FZen.Control</title>
+    <link rel="stylesheet" href="/CSS/style.css">
+
+</head>
+
+<body>
+
+    <header>
+        <nav id="sidebar">
+            <div class="logo"><img src="/IMAGES/Gemini_Generated_Image_3z6jdc3z6jdc3z6j-removebg-preview.png" alt=""
+                    style="width: 200px;"></div>
+
+
+            <div class="nav-group">
+                <a href="/index.html" class="nav-item">Accueil</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-label">Indépendants</div>
+                <a class="nav-item " href="/PAGES/freelance.html"><span class="nav-text">Auto-Entrepreneur</span></a>
+                <a class="nav-item active" href="/PAGES/tjm.html"><span class="nav-text">Calcul TJM</span></a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Finance & Patrimoine</div>
+                <a class="nav-item" href="/PAGES/immo.html"><span class="nav-text">Immobilier Locatif</span></a>
+                <a class="nav-item" href="/PAGES/pret.html"><span class="nav-text">Prêt & Crédit</span></a>
+                <a class="nav-item" href="/PAGES/epargne.html"><span class="nav-text">Épargne & Retraite</span></a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">Vie Professionnelle</div>
+                <a class="nav-item" href="/PAGES/salaire.html"><span class="nav-text">Brut → Net</span></a>
+                <a class="nav-item" href="/PAGES/ecommerce.html"><span class="nav-text">E-commerce / Marge</span></a>
+
+            </div>
+
+            <div class="/nav-group">
+                <div class="nav-label">Fiscalité & Santé</div>
+                <a class="nav-item" href="/PAGES/impot.html"><span class="nav-text">Impôt sur le Revenu</span></a>
+                <a class="nav-item" href="/PAGES/sante.html"><span class="nav-text">Santé & Mutuelle</span></a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main class="main-content" id="printable-area">
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
+                    style="color: var(--primary);">TJM</span></h1>
+            <div class="card">
+                <div class="input-group">
+                    <label>Revenu Net Mensuel souhaité (€)</label>
+                    <input type="number" id="v1" value="0" oninput="calculate()">
+                </div>
+                <div class="input-group">
+                    <label>Jours travaillés par mois</label>
+                    <input type="number" id="v2" value="0" oninput="calculate()">
+                </div>
+                <div class="result-area">
+                    <span id="res-label">TJM (Tarif Journalier Moyen) HT</span>
+                    <span class="result-val" id="res-total">0 €</span>
+                </div>
+            </div>
+            <script>
+                function calculate() {
+                    const net = parseFloat(document.getElementById('v1').value) || 0;
+                    const jours = parseFloat(document.getElementById('v2').value) || 1;
+                    const tjm = (net * 1.5) / jours; // 1.5 pour couvrir charges + frais
+                    document.getElementById('res-total').innerText = Math.round(tjm) + " €";
+                }
+
+            </script>
+
+        </main>
+        <footer class="sidebar-footer">
+            <div class="footer-text">© 2024 FZen.Control</div>
+        </footer>
+    </div>
+</body>
+
+</html>
