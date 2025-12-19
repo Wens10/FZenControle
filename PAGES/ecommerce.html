@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur Freelance - FZen.Control</title>
+    <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
 
 </head>
 
@@ -35,7 +36,8 @@
             <div class="nav-group">
                 <div class="nav-label">Vie Professionnelle</div>
                 <a class="nav-item" href="/PAGES/salaire.html"><span class="nav-text">Brut → Net</span></a>
-                <a class="nav-item active" href="/PAGES/ecommerce.html"><span class="nav-text">E-commerce / Marge</span></a>
+                <a class="nav-item active" href="/PAGES/ecommerce.html"><span class="nav-text">E-commerce /
+                        Marge</span></a>
 
             </div>
 
@@ -49,28 +51,150 @@
 
     <div class="container">
         <main class="main-content" id="printable-area">
-            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
-                    style="color: var(--primary);">E-commerce / Marge</span></h1>
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">
+                Calculateur <span style="color: var(--primary);">E-commerce / Marge</span>
+            </h1>
+
             <div class="card">
-                <div class="input-group"><label>Coût d'achat produit (€)</label><input type="number" id="v1" value="0"
-                        oninput="calculate()"></div>
-                <div class="input-group"><label>Marge souhaitée (%)</label><input type="number" id="v2" value="0"
-                        oninput="calculate()"></div>
-                <div class="result-area">
-                    <span id="res-label">Prix de vente conseillé HT</span>
-                    <span class="result-val" id="res-total">0 €</span>
+                <div class="input-group">
+                    <label>Coût d'achat produit (€)</label>
+                    <input type="number" id="v1" value="0" min="0" step="0.01" oninput="calculate()">
                 </div>
 
+                <div class="input-group">
+                    <label>Marge souhaitée (%)</label>
+                    <input type="number" id="v2" value="0" min="0" max="99.99" step="0.01" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label>TVA (%)</label>
+                    <input type="number" id="v3" value="20" min="0" step="0.01" oninput="calculate()">
+                </div>
+
+                <div class="result-area">
+                    <span id="res-label">Prix de vente conseillé</span>
+                    <span class="result-val" id="res-total">0 €</span>
+                    <div id="res-details"></div>
+                </div>
+
+                <div class="input-group">
+                    <button onclick="saveCalculation()"
+                        style="padding: 0.5rem 1rem; background: #5334db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Enregistrer le calcul
+                    </button>
+                </div>
             </div>
-            <script>
-                function calculate() {
-                    const cout = parseFloat(document.getElementById('v1').value) || 0;
-                    const marge = parseFloat(document.getElementById('v2').value) || 0;
-                    const prix = cout / (1 - (marge / 100));
-                    document.getElementById('res-total').innerText = prix.toFixed(2) + " €";
-                }
-            </script>
+
+            <div class="card" id="last-calc-card" style="display: none; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Dernier calcul enregistré</h2>
+
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <p><strong>Coût produit :</strong> <span id="last-cost">-</span> €</p>
+                    <p><strong>Marge :</strong> <span id="last-margin">-</span> %</p>
+                    <p><strong>TVA :</strong> <span id="last-tva">-</span> %</p>
+                    <p><strong>Prix HT :</strong> <span id="last-ht">-</span> €</p>
+                    <p><strong>Prix TTC :</strong> <span id="last-ttc">-</span> €</p>
+                    <p><strong>Marge en € :</strong> <span id="last-margin-euro">-</span> €</p>
+                    <p><strong>Date :</strong> <span id="last-date">-</span></p>
+                </div>
+
+                <button onclick="deleteCalculation()"
+                    style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Supprimer
+                </button>
+            </div>
         </main>
+
+        <script>
+            function calculate() {
+                const cost = parseFloat(document.getElementById('v1').value) || 0;
+                const margin = parseFloat(document.getElementById('v2').value) || 0;
+                const tva = parseFloat(document.getElementById('v3').value) || 0;
+
+                if (margin >= 100) {
+                    document.getElementById('res-total').innerText = "Marge invalide";
+                    document.getElementById('res-details').innerText = "";
+                    return;
+                }
+
+                const priceHT = cost / (1 - margin / 100);
+                const priceTTC = priceHT * (1 + tva / 100);
+                const marginEuro = priceHT - cost;
+
+                document.getElementById('res-total').innerText =
+                    priceHT.toFixed(2) + " € HT / " + priceTTC.toFixed(2) + " € TTC";
+
+                document.getElementById('res-details').innerHTML = `
+        Marge : ${marginEuro.toFixed(2)} €<br>
+        TVA : ${tva.toFixed(1)} %
+    `;
+            }
+
+            function saveCalculation() {
+                const cost = document.getElementById('v1').value;
+                const margin = document.getElementById('v2').value;
+                const tva = document.getElementById('v3').value;
+
+                const priceHT = cost / (1 - margin / 100);
+                const priceTTC = priceHT * (1 + tva / 100);
+                const marginEuro = priceHT - cost;
+
+                localStorage.setItem('lastEcommerceCalculation', JSON.stringify({
+                    cost: cost,
+                    margin: margin,
+                    tva: tva,
+                    priceHT: priceHT.toFixed(2),
+                    priceTTC: priceTTC.toFixed(2),
+                    marginEuro: marginEuro.toFixed(2),
+                    date: new Date().toLocaleString()
+                }));
+
+                displayLastCalculation();
+            }
+
+            function displayLastCalculation() {
+                const saved = localStorage.getItem('lastEcommerceCalculation');
+                const card = document.getElementById('last-calc-card');
+
+                if (!saved) {
+                    card.style.display = 'none';
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+
+                document.getElementById('last-cost').innerText = data.cost;
+                document.getElementById('last-margin').innerText = data.margin;
+                document.getElementById('last-tva').innerText = data.tva;
+                document.getElementById('last-ht').innerText = data.priceHT;
+                document.getElementById('last-ttc').innerText = data.priceTTC;
+                document.getElementById('last-margin-euro').innerText = data.marginEuro;
+                document.getElementById('last-date').innerText = data.date;
+
+                card.style.display = 'block';
+            }
+
+            function deleteCalculation() {
+                localStorage.removeItem('lastEcommerceCalculation');
+                displayLastCalculation();
+            }
+
+            function loadLastCalculation() {
+                const saved = localStorage.getItem('lastEcommerceCalculation');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('v1').value = data.cost;
+                    document.getElementById('v2').value = data.margin;
+                    document.getElementById('v3').value = data.tva;
+                    calculate();
+                }
+                displayLastCalculation();
+            }
+
+            window.onload = loadLastCalculation;
+        </script>
+
+
         <footer class="sidebar-footer">
             <div class="footer-text">© 2024 FZen.Control</div>
         </footer>

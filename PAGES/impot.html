@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur Freelance - FZen.Control</title>
+    <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
 
 </head>
 
@@ -36,12 +37,13 @@
                 <div class="nav-label">Vie Professionnelle</div>
                 <a class="nav-item" href="/PAGES/salaire.html"><span class="nav-text">Brut → Net</span></a>
                 <a class="nav-item" href="/PAGES/ecommerce.html"><span class="nav-text">E-commerce / Marge</span></a>
-               
+
             </div>
 
             <div class="nav-group">
                 <div class="nav-label">Fiscalité & Santé</div>
-                <a class="nav-item active" href="/PAGES/impot.html"><span class="nav-text">Impôt sur le Revenu</span></a>
+                <a class="nav-item active" href="/PAGES/impot.html"><span class="nav-text">Impôt sur le
+                        Revenu</span></a>
                 <a class="nav-item" href="/PAGES/sante.html"><span class="nav-text">Santé & Mutuelle</span></a>
             </div>
         </nav>
@@ -49,27 +51,131 @@
 
     <div class="container">
         <main class="main-content" id="printable-area">
-            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
-                    style="color: var(--primary);">Impôt</span></h1>
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">
+                Calculateur <span style="color: var(--primary);">Impôt</span>
+            </h1>
+
             <div class="card">
-                <div class="input-group"><label>Revenu Net Imposable Annuel (€)</label><input type="number" id="v1"
-                        value="0" oninput="calculate()"></div>
-                <div class="result-area">
-                    <span id="res-label">Impôt estimé (Tranche 30%)</span>
-                    <span class="result-val" id="res-total">0 €</span>
+                <div class="input-group">
+                    <label>Revenu Net Imposable Annuel (€)</label>
+                    <input type="number" id="v1" value="0" min="0" oninput="calculate()">
                 </div>
-                
+
+                <div class="result-area">
+                    <span id="res-label">Impôt estimé</span>
+                    <span class="result-val" id="res-total">0 €</span>
+                    <div id="res-details" style="margin-top:0.5rem; font-size:0.9rem;"></div>
+                </div>
+
+                <div class="input-group">
+                    <button onclick="saveCalculation()"
+                        style="padding: 0.5rem 1rem; background: #5334db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Enregistrer le calcul
+                    </button>
+                </div>
             </div>
-            <script>
-                function calculate() {
-                    const r = parseFloat(document.getElementById('v1').value) || 0;
-                    let impot = 0;
-                    if (r > 28797) impot = (r - 28797) * 0.30 + (28797 - 11294) * 0.11;
-                    else if (r > 11294) impot = (r - 11294) * 0.11;
-                    document.getElementById('res-total').innerText = Math.round(impot).toLocaleString() + " €";
-                }
-            </script>
+
+            <div class="card" id="last-calc-card" style="display: none; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Dernier calcul enregistré</h2>
+
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <p><strong>Revenu imposable :</strong> <span id="last-revenu">-</span> €</p>
+                    <p><strong>Impôt estimé :</strong> <span id="last-impot">-</span> €</p>
+                    <p><strong>Taux moyen :</strong> <span id="last-taux">-</span> %</p>
+                    <p><strong>Date :</strong> <span id="last-date">-</span></p>
+                </div>
+
+                <button onclick="deleteCalculation()"
+                    style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Supprimer
+                </button>
+            </div>
         </main>
+
+        <script>
+            function calculate() {
+                const revenu = parseFloat(document.getElementById('v1').value) || 0;
+                let impot = 0;
+
+                // Barème simplifié (1 part)
+                if (revenu > 168994) {
+                    impot += (revenu - 168994) * 0.45;
+                    impot += (168994 - 78570) * 0.41;
+                    impot += (78570 - 28797) * 0.30;
+                    impot += (28797 - 11294) * 0.11;
+                } else if (revenu > 78570) {
+                    impot += (revenu - 78570) * 0.41;
+                    impot += (78570 - 28797) * 0.30;
+                    impot += (28797 - 11294) * 0.11;
+                } else if (revenu > 28797) {
+                    impot += (revenu - 28797) * 0.30;
+                    impot += (28797 - 11294) * 0.11;
+                } else if (revenu > 11294) {
+                    impot += (revenu - 11294) * 0.11;
+                }
+
+                const tauxMoyen = revenu > 0 ? (impot / revenu) * 100 : 0;
+
+                document.getElementById('res-total').innerText =
+                    Math.round(impot).toLocaleString() + " €";
+
+                document.getElementById('res-details').innerHTML =
+                    `Taux moyen d'imposition : ${tauxMoyen.toFixed(2)} %`;
+            }
+
+            function saveCalculation() {
+                const revenu = parseFloat(document.getElementById('v1').value) || 0;
+                const impotText = document.getElementById('res-total').innerText;
+                const impot = parseFloat(impotText.replace(/\s/g, '').replace('€', '')) || 0;
+                const tauxMoyen = revenu > 0 ? (impot / revenu) * 100 : 0;
+
+                localStorage.setItem('lastImpotCalc', JSON.stringify({
+                    revenu: revenu.toFixed(2),
+                    impot: impot.toFixed(2),
+                    taux: tauxMoyen.toFixed(2),
+                    date: new Date().toLocaleString()
+                }));
+
+                displayLastCalculation();
+            }
+
+            function displayLastCalculation() {
+                const saved = localStorage.getItem('lastImpotCalc');
+                const card = document.getElementById('last-calc-card');
+
+                if (!saved) {
+                    card.style.display = 'none';
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+
+                document.getElementById('last-revenu').innerText = data.revenu;
+                document.getElementById('last-impot').innerText = data.impot;
+                document.getElementById('last-taux').innerText = data.taux;
+                document.getElementById('last-date').innerText = data.date;
+
+                card.style.display = 'block';
+            }
+
+            function deleteCalculation() {
+                localStorage.removeItem('lastImpotCalc');
+                displayLastCalculation();
+            }
+
+            function loadLastCalculation() {
+                const saved = localStorage.getItem('lastImpotCalc');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('v1').value = data.revenu;
+                    calculate();
+                }
+                displayLastCalculation();
+            }
+
+            window.onload = loadLastCalculation;
+        </script>
+
         <footer class="sidebar-footer">
             <div class="footer-text">© 2024 FZen.Control</div>
         </footer>

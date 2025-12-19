@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur Freelance - FZen.Control</title>
+    <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
 
 </head>
 
@@ -49,11 +50,16 @@
 
     <div class="container">
         <main class="main-content" id="printable-area">
-            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
-                    style="color: var(--primary);">Salaire</span></h1>
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">
+                Calculateur <span style="color: var(--primary);">Salaire</span>
+            </h1>
+
             <div class="card">
-                <div class="input-group"><label>Salaire Brut Annuel (€)</label><input type="number" id="v1"
-                        value="0" oninput="calculate()"></div>
+                <div class="input-group">
+                    <label>Salaire Brut Annuel (€)</label>
+                    <input type="number" id="v1" value="0" min="0" step="0.01" oninput="calculate()">
+                </div>
+
                 <div class="input-group">
                     <label>Statut</label>
                     <select id="v2" onchange="calculate()">
@@ -61,20 +67,120 @@
                         <option value="0.75">Salarié cadre (25% charges)</option>
                     </select>
                 </div>
+
                 <div class="result-area">
                     <span id="res-label">Salaire Net Mensuel</span>
                     <span class="result-val" id="res-total">0 €</span>
+                    <div id="res-details" style="margin-top:0.5rem; font-size:0.9rem;"></div>
+                </div>
+
+                <div class="input-group">
+                    <button onclick="saveCalculation()"
+                        style="padding: 0.5rem 1rem; background: #5334db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Enregistrer le calcul
+                    </button>
                 </div>
             </div>
-            <script>
-                function calculate() {
-                    const brut = parseFloat(document.getElementById('v1').value) || 0;
-                    const ratio = parseFloat(document.getElementById('v2').value);
-                    const netMensuel = (brut * ratio) / 12;
-                    document.getElementById('res-total').innerText = Math.round(netMensuel).toLocaleString() + " €";
-                }
-            </script>
+
+            <div class="card" id="last-calc-card" style="display: none; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Dernier calcul enregistré</h2>
+
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <p><strong>Salaire brut annuel :</strong> <span id="last-brut">-</span> €</p>
+                    <p><strong>Statut :</strong> <span id="last-status">-</span></p>
+                    <p><strong>Salaire net annuel :</strong> <span id="last-net-annual">-</span> €</p>
+                    <p><strong>Salaire net mensuel :</strong> <span id="last-net-month">-</span> €</p>
+                    <p><strong>Charges estimées :</strong> <span id="last-charges">-</span> €</p>
+                    <p><strong>Date :</strong> <span id="last-date">-</span></p>
+                </div>
+
+                <button onclick="deleteCalculation()"
+                    style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Supprimer
+                </button>
+            </div>
         </main>
+
+        <script>
+            function calculate() {
+                const brut = parseFloat(document.getElementById('v1').value) || 0;
+                const ratio = parseFloat(document.getElementById('v2').value);
+
+                const netAnnuel = brut * ratio;
+                const netMensuel = netAnnuel / 12;
+                const charges = brut - netAnnuel;
+
+                document.getElementById('res-total').innerText = Math.round(netMensuel).toLocaleString() + " €";
+                document.getElementById('res-details').innerHTML = `
+        Salaire net annuel : ${netAnnuel.toFixed(2)} €<br>
+        Charges estimées : ${charges.toFixed(2)} €
+    `;
+            }
+
+            function saveCalculation() {
+                const brut = parseFloat(document.getElementById('v1').value) || 0;
+                const ratio = parseFloat(document.getElementById('v2').value);
+                const statusText = document.getElementById('v2').selectedOptions[0].text;
+
+                const netAnnuel = brut * ratio;
+                const netMensuel = netAnnuel / 12;
+                const charges = brut - netAnnuel;
+
+                localStorage.setItem('lastSalaryCalc', JSON.stringify({
+                    brut: brut.toFixed(2),
+                    status: statusText,
+                    netAnnuel: netAnnuel.toFixed(2),
+                    netMensuel: netMensuel.toFixed(2),
+                    charges: charges.toFixed(2),
+                    date: new Date().toLocaleString()
+                }));
+
+                displayLastCalculation();
+            }
+
+            function displayLastCalculation() {
+                const saved = localStorage.getItem('lastSalaryCalc');
+                const card = document.getElementById('last-calc-card');
+
+                if (!saved) {
+                    card.style.display = 'none';
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+                document.getElementById('last-brut').innerText = data.brut;
+                document.getElementById('last-status').innerText = data.status;
+                document.getElementById('last-net-annual').innerText = data.netAnnuel;
+                document.getElementById('last-net-month').innerText = data.netMensuel;
+                document.getElementById('last-charges').innerText = data.charges;
+                document.getElementById('last-date').innerText = data.date;
+
+                card.style.display = 'block';
+            }
+
+            function deleteCalculation() {
+                localStorage.removeItem('lastSalaryCalc');
+                displayLastCalculation();
+            }
+
+            function loadLastCalculation() {
+                const saved = localStorage.getItem('lastSalaryCalc');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('v1').value = data.brut;
+                    if (data.status.includes("non-cadre")) {
+                        document.getElementById('v2').value = "0.78";
+                    } else {
+                        document.getElementById('v2').value = "0.75";
+                    }
+                    calculate();
+                }
+                displayLastCalculation();
+            }
+
+            window.onload = loadLastCalculation;
+        </script>
+
         <footer class="sidebar-footer">
             <div class="footer-text">© 2024 FZen.Control</div>
         </footer>

@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur Freelance - FZen.Control</title>
+    <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
 
 </head>
 
@@ -29,7 +30,8 @@
                 <div class="nav-label">Finance & Patrimoine</div>
                 <a class="nav-item" href="/PAGES/immo.html"><span class="nav-text">Immobilier Locatif</span></a>
                 <a class="nav-item" href="/PAGES/pret.html"><span class="nav-text">Prêt & Crédit</span></a>
-                <a class="nav-item active" href="/PAGES/epargne.html"><span class="nav-text">Épargne & Retraite</span></a>
+                <a class="nav-item active" href="/PAGES/epargne.html"><span class="nav-text">Épargne &
+                        Retraite</span></a>
             </div>
 
             <div class="nav-group">
@@ -49,31 +51,140 @@
 
     <div class="container">
         <main class="main-content" id="printable-area">
-            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
-                    style="color: var(--primary);">Épargne & Retraite</span></h1>
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">
+                Calculateur <span style="color: var(--primary);">Épargne & Retraite</span>
+            </h1>
+
             <div class="card">
-                <div class="input-group"><label>Versement mensuel (€)</label><input type="number" id="v1" value="0"
-                        oninput="calculate()"></div>
-                <div class="input-group"><label>Taux d'intérêt annuel (%)</label><input type="number" id="v2" value="0"
-                        oninput="calculate()"></div>
-                <div class="input-group"><label>Nombre d'années</label><input type="number" id="v3" value="0"
-                        oninput="calculate()"></div>
+                <div class="input-group">
+                    <label>Versement mensuel (€)</label>
+                    <input type="number" id="v1" value="0" min="0" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label>Taux d'intérêt annuel (%)</label>
+                    <input type="number" id="v2" value="0" min="0" step="0.1" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label>Nombre d'années</label>
+                    <input type="number" id="v3" value="0" min="0" oninput="calculate()">
+                </div>
+
                 <div class="result-area">
                     <span id="res-label">Capital final estimé</span>
                     <span class="result-val" id="res-total">0 €</span>
+                    <div id="res-details" style="margin-top:0.5rem; font-size:0.9rem;"></div>
                 </div>
 
+                <div class="input-group">
+                    <button onclick="saveCalculation()"
+                        style="padding: 0.5rem 1rem; background: #5334db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Enregistrer le calcul
+                    </button>
+                </div>
             </div>
-            <script>
-                function calculate() {
-                    const v = parseFloat(document.getElementById('v1').value) || 0;
-                    const r = parseFloat(document.getElementById('v2').value) / 100 / 12;
-                    const n = parseFloat(document.getElementById('v3').value) * 12;
-                    const total = v * ((Math.pow(1 + r, n) - 1) / r);
-                    document.getElementById('res-total').innerText = Math.round(total).toLocaleString() + " €";
-                }
-            </script>
+
+            <div class="card" id="last-calc-card" style="display: none; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Dernier calcul enregistré</h2>
+
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <p><strong>Versement mensuel :</strong> <span id="last-v">-</span> €</p>
+                    <p><strong>Taux annuel :</strong> <span id="last-taux">-</span> %</p>
+                    <p><strong>Durée :</strong> <span id="last-duree">-</span> ans</p>
+                    <p><strong>Capital final :</strong> <span id="last-total">-</span> €</p>
+                    <p><strong>Date :</strong> <span id="last-date">-</span></p>
+                </div>
+
+                <button onclick="deleteCalculation()"
+                    style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Supprimer
+                </button>
+            </div>
         </main>
+
+        <script>
+            function calculate() {
+                const versement = parseFloat(document.getElementById('v1').value) || 0;
+                const tauxAnnuel = parseFloat(document.getElementById('v2').value) || 0;
+                const annees = parseFloat(document.getElementById('v3').value) || 0;
+
+                const r = tauxAnnuel / 100 / 12;
+                const n = annees * 12;
+
+                let total = 0;
+
+                if (r > 0) {
+                    total = versement * ((Math.pow(1 + r, n) - 1) / r);
+                } else {
+                    total = versement * n;
+                }
+
+                document.getElementById('res-total').innerText =
+                    Math.round(total).toLocaleString() + " €";
+
+                document.getElementById('res-details').innerHTML = `
+        Total versé : ${(versement * n).toLocaleString()} €
+    `;
+            }
+
+            function saveCalculation() {
+                const versement = parseFloat(document.getElementById('v1').value) || 0;
+                const taux = parseFloat(document.getElementById('v2').value) || 0;
+                const annees = parseFloat(document.getElementById('v3').value) || 0;
+                const totalText = document.getElementById('res-total').innerText;
+
+                localStorage.setItem('lastEpargneCalc', JSON.stringify({
+                    versement: versement.toFixed(2),
+                    taux: taux.toFixed(2),
+                    annees: annees,
+                    total: totalText.replace('€', '').trim(),
+                    date: new Date().toLocaleString()
+                }));
+
+                displayLastCalculation();
+            }
+
+            function displayLastCalculation() {
+                const saved = localStorage.getItem('lastEpargneCalc');
+                const card = document.getElementById('last-calc-card');
+
+                if (!saved) {
+                    card.style.display = 'none';
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+
+                document.getElementById('last-v').innerText = data.versement;
+                document.getElementById('last-taux').innerText = data.taux;
+                document.getElementById('last-duree').innerText = data.annees;
+                document.getElementById('last-total').innerText = data.total;
+                document.getElementById('last-date').innerText = data.date;
+
+                card.style.display = 'block';
+            }
+
+            function deleteCalculation() {
+                localStorage.removeItem('lastEpargneCalc');
+                displayLastCalculation();
+            }
+
+            function loadLastCalculation() {
+                const saved = localStorage.getItem('lastEpargneCalc');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('v1').value = data.versement;
+                    document.getElementById('v2').value = data.taux;
+                    document.getElementById('v3').value = data.annees;
+                    calculate();
+                }
+                displayLastCalculation();
+            }
+
+            window.onload = loadLastCalculation;
+        </script>
+
         <footer class="sidebar-footer">
             <div class="footer-text">© 2024 FZen.Control</div>
         </footer>

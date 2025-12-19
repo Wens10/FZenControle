@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur Freelance - FZen.Control</title>
+    <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
 
 </head>
 
@@ -49,31 +50,147 @@
 
     <div class="container">
         <main class="main-content" id="printable-area">
-            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
-                    style="color: var(--primary);">Prêt & Crédit</span></h1>
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">
+                Calculateur <span style="color: var(--primary);">Prêt & Crédit</span>
+            </h1>
+
             <div class="card">
-                <div class="input-group"><label>Montant du prêt (€)</label><input type="number" id="v1" value="0"
-                        oninput="calculate()"></div>
-                <div class="input-group"><label>Taux annuel (%)</label><input type="number" id="v2" value="3.5"
-                        step="0.1" oninput="calculate()"></div>
-                <div class="input-group"><label>Durée (années)</label><input type="number" id="v3" value="20"
-                        oninput="calculate()"></div>
+                <div class="input-group">
+                    <label>Montant du prêt (€)</label>
+                    <input type="number" id="v1" value="0" min="0" step="0.01" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label>Taux annuel (%)</label>
+                    <input type="number" id="v2" value="3.5" step="0.01" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label>Durée (années)</label>
+                    <input type="number" id="v3" value="20" min="1" step="1" oninput="calculate()">
+                </div>
+
                 <div class="result-area">
                     <span id="res-label">Mensualité</span>
                     <span class="result-val" id="res-total">0 €</span>
+                    <div id="res-details" style="margin-top:0.5rem; font-size:0.9rem;"></div>
                 </div>
-                
+
+                <div class="input-group">
+                    <button onclick="saveCalculation()"
+                        style="padding: 0.5rem 1rem; background: #5334db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Enregistrer le calcul
+                    </button>
+                </div>
             </div>
-            <script>
-                function calculate() {
-                    const mnt = parseFloat(document.getElementById('v1').value) || 0;
-                    const taux = parseFloat(document.getElementById('v2').value) / 100 / 12;
-                    const duree = parseFloat(document.getElementById('v3').value) * 12;
-                    const mens = (mnt * taux) / (1 - Math.pow(1 + taux, -duree));
-                    document.getElementById('res-total').innerText = Math.round(mens).toLocaleString() + " €";
-                }
-            </script>
+
+            <div class="card" id="last-calc-card" style="display: none; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Dernier calcul enregistré</h2>
+
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <p><strong>Montant du prêt :</strong> <span id="last-montant">-</span> €</p>
+                    <p><strong>Taux annuel :</strong> <span id="last-taux">-</span> %</p>
+                    <p><strong>Durée :</strong> <span id="last-duree">-</span> ans</p>
+                    <p><strong>Mensualité :</strong> <span id="last-mens">-</span> €</p>
+                    <p><strong>Coût total du crédit :</strong> <span id="last-total">-</span> €</p>
+                    <p><strong>Intérêts totaux :</strong> <span id="last-interets">-</span> €</p>
+                    <p><strong>Date :</strong> <span id="last-date">-</span></p>
+                </div>
+
+                <button onclick="deleteCalculation()"
+                    style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Supprimer
+                </button>
+            </div>
         </main>
+
+        <script>
+            function calculate() {
+                const montant = parseFloat(document.getElementById('v1').value) || 0;
+                const tauxAnnuel = parseFloat(document.getElementById('v2').value) || 0;
+                const dureeAnnees = parseFloat(document.getElementById('v3').value) || 1;
+
+                const tauxMensuel = tauxAnnuel / 100 / 12;
+                const dureeMois = dureeAnnees * 12;
+
+                const mensualite = (montant * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -dureeMois));
+                const totalCredit = mensualite * dureeMois;
+                const interets = totalCredit - montant;
+
+                document.getElementById('res-total').innerText = Math.round(mensualite).toLocaleString() + " €";
+                document.getElementById('res-details').innerHTML = `
+        Coût total du crédit : ${totalCredit.toFixed(2)} €<br>
+        Intérêts totaux : ${interets.toFixed(2)} €
+    `;
+            }
+
+            function saveCalculation() {
+                const montant = parseFloat(document.getElementById('v1').value) || 0;
+                const tauxAnnuel = parseFloat(document.getElementById('v2').value) || 0;
+                const dureeAnnees = parseFloat(document.getElementById('v3').value) || 1;
+
+                const tauxMensuel = tauxAnnuel / 100 / 12;
+                const dureeMois = dureeAnnees * 12;
+
+                const mensualite = (montant * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -dureeMois));
+                const totalCredit = mensualite * dureeMois;
+                const interets = totalCredit - montant;
+
+                localStorage.setItem('lastCreditCalc', JSON.stringify({
+                    montant: montant.toFixed(2),
+                    tauxAnnuel: tauxAnnuel.toFixed(2),
+                    dureeAnnees: dureeAnnees,
+                    mensualite: mensualite.toFixed(2),
+                    totalCredit: totalCredit.toFixed(2),
+                    interets: interets.toFixed(2),
+                    date: new Date().toLocaleString()
+                }));
+
+                displayLastCalculation();
+            }
+
+            function displayLastCalculation() {
+                const saved = localStorage.getItem('lastCreditCalc');
+                const card = document.getElementById('last-calc-card');
+
+                if (!saved) {
+                    card.style.display = 'none';
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+
+                document.getElementById('last-montant').innerText = data.montant;
+                document.getElementById('last-taux').innerText = data.tauxAnnuel;
+                document.getElementById('last-duree').innerText = data.dureeAnnees;
+                document.getElementById('last-mens').innerText = Math.round(data.mensualite);
+                document.getElementById('last-total').innerText = data.totalCredit;
+                document.getElementById('last-interets').innerText = data.interets;
+                document.getElementById('last-date').innerText = data.date;
+
+                card.style.display = 'block';
+            }
+
+            function deleteCalculation() {
+                localStorage.removeItem('lastCreditCalc');
+                displayLastCalculation();
+            }
+
+            function loadLastCalculation() {
+                const saved = localStorage.getItem('lastCreditCalc');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('v1').value = data.montant;
+                    document.getElementById('v2').value = data.tauxAnnuel;
+                    document.getElementById('v3').value = data.dureeAnnees;
+                    calculate();
+                }
+                displayLastCalculation();
+            }
+
+            window.onload = loadLastCalculation;
+        </script>
+
         <footer class="sidebar-footer">
             <div class="footer-text">© 2024 FZen.Control</div>
         </footer>

@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur Freelance - FZen.Control</title>
+    <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
 
 </head>
 
@@ -12,7 +13,8 @@
 
     <header>
         <nav id="sidebar">
-             <div class="logo"><img src="/IMAGES/Gemini_Generated_Image_3z6jdc3z6jdc3z6j-removebg-preview.png" alt="" style="width: 200px;"></div>
+            <div class="logo"><img src="/IMAGES/Gemini_Generated_Image_3z6jdc3z6jdc3z6j-removebg-preview.png" alt=""
+                    style="width: 200px;"></div>
 
 
             <div class="nav-group">
@@ -20,7 +22,8 @@
             </div>
             <div class="nav-group">
                 <div class="nav-label">Indépendants</div>
-                <a class="nav-item active" href="/PAGES/freelance.html"><span class="nav-text">Auto-Entrepreneur</span></a>
+                <a class="nav-item active" href="/PAGES/freelance.html"><span
+                        class="nav-text">Auto-Entrepreneur</span></a>
                 <a class="nav-item" href="/PAGES/tjm.html"><span class="nav-text">Calcul TJM</span></a>
             </div>
 
@@ -35,7 +38,7 @@
                 <div class="nav-label">Vie Professionnelle</div>
                 <a class="nav-item" href="/PAGES/salaire.html"><span class="nav-text">Brut → Net</span></a>
                 <a class="nav-item" href="/PAGES/ecommerce.html"><span class="nav-text">E-commerce / Marge</span></a>
-               
+
             </div>
 
             <div class="nav-group">
@@ -48,14 +51,16 @@
 
     <div class="container">
         <main class="main-content" id="printable-area">
-            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
-                    style="color: var(--primary);">Auto-Entrepreneur</span></h1>
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">
+                Calculateur <span style="color: var(--primary);">Auto-Entrepreneur</span>
+            </h1>
 
             <div class="card">
                 <div class="input-group">
                     <label>Chiffre d'Affaires Mensuel (€)</label>
-                    <input type="number" id="v1" value="0" oninput="calculate()">
+                    <input type="number" id="v1" value="0" min="0" step="0.01" oninput="calculate()">
                 </div>
+
                 <div class="input-group">
                     <label>Charges sociales (%)</label>
                     <select id="v2" onchange="calculate()">
@@ -67,42 +72,120 @@
                 <div class="result-area">
                     <span id="res-label">Revenu Net après charges</span>
                     <span class="result-val" id="res-total">0 €</span>
+                    <div id="res-details" style="margin-top:0.5rem; font-size:0.9rem;"></div>
                 </div>
-                
+
+                <div class="input-group">
+                    <button onclick="saveCalculation()"
+                        style="padding: 0.5rem 1rem; background: #5334db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Enregistrer le calcul
+                    </button>
+                </div>
             </div>
 
+            <div class="card" id="last-calc-card" style="display: none; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Dernier calcul enregistré</h2>
 
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <p><strong>Chiffre d'Affaires mensuel :</strong> <span id="last-ca">-</span> €</p>
+                    <p><strong>Taux appliqué :</strong> <span id="last-taux">-</span></p>
+                    <p><strong>Charges sociales :</strong> <span id="last-charges">-</span> €</p>
+                    <p><strong>Revenu net mensuel :</strong> <span id="last-result">-</span></p>
+                    <p><strong>Revenu net annuel :</strong> <span id="last-annual">-</span></p>
+                    <p><strong>Date :</strong> <span id="last-date">-</span></p>
+                </div>
 
+                <button onclick="deleteCalculation()"
+                    style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Supprimer
+                </button>
+            </div>
         </main>
+
+        <script>
+            function calculate() {
+                const ca = parseFloat(document.getElementById('v1').value) || 0;
+                const taux = parseFloat(document.getElementById('v2').value);
+
+                const charges = ca * taux;
+                const netMensuel = ca - charges;
+                const netAnnuel = netMensuel * 12;
+
+                document.getElementById('res-total').innerText =
+                    netMensuel.toFixed(2).toLocaleString() + " €";
+
+                document.getElementById('res-details').innerHTML = `
+        Charges sociales : ${charges.toFixed(2)} €<br>
+        Revenu net annuel : ${netAnnuel.toFixed(2)} €
+    `;
+            }
+
+            function saveCalculation() {
+                const ca = document.getElementById('v1').value;
+                const taux = document.getElementById('v2').value;
+
+                const charges = (ca * taux).toFixed(2);
+                const netMensuel = (ca - ca * taux).toFixed(2);
+                const netAnnuel = (netMensuel * 12).toFixed(2);
+
+                localStorage.setItem('lastCalculation', JSON.stringify({
+                    ca: ca,
+                    taux: taux,
+                    charges: charges,
+                    netMensuel: netMensuel,
+                    netAnnuel: netAnnuel,
+                    date: new Date().toLocaleString()
+                }));
+
+                displayLastCalculation();
+            }
+
+            function displayLastCalculation() {
+                const saved = localStorage.getItem('lastCalculation');
+                const card = document.getElementById('last-calc-card');
+
+                if (!saved) {
+                    card.style.display = 'none';
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+
+                document.getElementById('last-ca').innerText = data.ca;
+                document.getElementById('last-taux').innerText = (data.taux * 100).toFixed(1) + " %";
+                document.getElementById('last-charges').innerText = data.charges;
+                document.getElementById('last-result').innerText = data.netMensuel + " €";
+                document.getElementById('last-annual').innerText = data.netAnnuel + " €";
+                document.getElementById('last-date').innerText = data.date;
+
+                card.style.display = 'block';
+            }
+
+            function deleteCalculation() {
+                localStorage.removeItem('lastCalculation');
+                displayLastCalculation();
+            }
+
+            function loadLastCalculation() {
+                const saved = localStorage.getItem('lastCalculation');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('v1').value = data.ca;
+                    document.getElementById('v2').value = data.taux;
+                    calculate();
+                }
+                displayLastCalculation();
+            }
+
+            window.onload = loadLastCalculation;
+        </script>
+
         <footer class="sidebar-footer">
             <div class="footer-text">© 2024 FZen.Control</div>
         </footer>
     </div>
 
-    <script>
-        function calculate() {
-            const ca = parseFloat(document.getElementById('v1').value) || 0;
-            const taux = parseFloat(document.getElementById('v2').value);
-            const net = ca * (1 - taux);
-            document.getElementById('res-total').innerText = Math.round(net).toLocaleString() + " €";
-        }
 
-        function exportWord() {
-            const title = document.querySelector('h1').innerText;
-            const result = document.getElementById('res-total').innerText;
-            const label = document.getElementById('res-label').innerText;
-            const content = `<h1>${title}</h1><p>Rapport de calcul CalcuPro</p><h2>${label} : ${result}</h2>`;
-
-            const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'Calcul-CalcuPro.doc';
-            link.click();
-        }
-
-        window.onload = calculate;
-    </script>
 </body>
 
 </html>

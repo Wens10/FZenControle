@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur Freelance - FZen.Control</title>
+    <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
 
 </head>
 
@@ -36,7 +37,7 @@
                 <div class="nav-label">Vie Professionnelle</div>
                 <a class="nav-item" href="/PAGES/salaire.html"><span class="nav-text">Brut → Net</span></a>
                 <a class="nav-item" href="/PAGES/ecommerce.html"><span class="nav-text">E-commerce / Marge</span></a>
-               
+
             </div>
 
             <div class="nav-group">
@@ -49,28 +50,129 @@
 
     <div class="container">
         <main class="main-content" id="printable-area">
-            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
-                    style="color: var(--primary);">Immobilier Locatif</span></h1>
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">
+                Calculateur <span style="color: var(--primary);">Immobilier Locatif</span>
+            </h1>
+
             <div class="card">
-                <div class="input-group"><label>Prix d'achat total (€)</label><input type="number" id="v1"
-                        value="0" oninput="calculate()"></div>
-                <div class="input-group"><label>Loyer mensuel hors charges (€)</label><input type="number" id="v2"
-                        value="0" oninput="calculate()"></div>
+                <div class="input-group">
+                    <label>Prix d'achat total (€)</label>
+                    <input type="number" id="v1" value="0" min="0" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label>Loyer mensuel hors charges (€)</label>
+                    <input type="number" id="v2" value="0" min="0" oninput="calculate()">
+                </div>
+
                 <div class="result-area">
-                    <span id="res-label">Rentabilité Brute Annuelle</span>
+                    <span id="res-label">Rentabilité</span>
                     <span class="result-val" id="res-total">0 %</span>
+                    <div id="res-details" style="margin-top:0.5rem; font-size:0.9rem;"></div>
+                </div>
+
+                <div class="input-group">
+                    <button onclick="saveCalculation()"
+                        style="padding: 0.5rem 1rem; background: #5334db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Enregistrer le calcul
+                    </button>
                 </div>
             </div>
-            <script>
-                function calculate() {
-                    const prix = parseFloat(document.getElementById('v1').value) || 1;
-                    const loyer = parseFloat(document.getElementById('v2').value) || 0;
-                    const rendement = (loyer * 12 / prix) * 100;
-                    document.getElementById('res-total').innerText = rendement.toFixed(2) + " %";
-                }
-            </script>
 
+            <div class="card" id="last-calc-card" style="display: none; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Dernier calcul enregistré</h2>
+
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <p><strong>Prix d'achat :</strong> <span id="last-prix">-</span> €</p>
+                    <p><strong>Loyer mensuel :</strong> <span id="last-loyer">-</span> €</p>
+                    <p><strong>Rentabilité brute :</strong> <span id="last-brute">-</span> %</p>
+                    <p><strong>Rentabilité nette estimée :</strong> <span id="last-nette">-</span> %</p>
+                    <p><strong>Date :</strong> <span id="last-date">-</span></p>
+                </div>
+
+                <button onclick="deleteCalculation()"
+                    style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Supprimer
+                </button>
+            </div>
         </main>
+
+        <script>
+            function calculate() {
+                const prix = parseFloat(document.getElementById('v1').value) || 1;
+                const loyer = parseFloat(document.getElementById('v2').value) || 0;
+
+                const revenusAnnuels = loyer * 12;
+                const rentBrute = (revenusAnnuels / prix) * 100;
+
+                // Estimation charges globales 25% (taxe foncière, vacance, gestion, entretien)
+                const revenusNet = revenusAnnuels * 0.75;
+                const rentNette = (revenusNet / prix) * 100;
+
+                document.getElementById('res-total').innerText = rentBrute.toFixed(2) + " %";
+                document.getElementById('res-details').innerHTML = `
+        Rentabilité nette estimée : ${rentNette.toFixed(2)} %
+    `;
+            }
+
+            function saveCalculation() {
+                const prix = parseFloat(document.getElementById('v1').value) || 0;
+                const loyer = parseFloat(document.getElementById('v2').value) || 0;
+
+                const revenusAnnuels = loyer * 12;
+                const rentBrute = (revenusAnnuels / prix) * 100;
+                const rentNette = ((revenusAnnuels * 0.75) / prix) * 100;
+
+                localStorage.setItem('lastImmoCalc', JSON.stringify({
+                    prix: prix.toFixed(2),
+                    loyer: loyer.toFixed(2),
+                    brute: rentBrute.toFixed(2),
+                    nette: rentNette.toFixed(2),
+                    date: new Date().toLocaleString()
+                }));
+
+                displayLastCalculation();
+            }
+
+            function displayLastCalculation() {
+                const saved = localStorage.getItem('lastImmoCalc');
+                const card = document.getElementById('last-calc-card');
+
+                if (!saved) {
+                    card.style.display = 'none';
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+
+                document.getElementById('last-prix').innerText = data.prix;
+                document.getElementById('last-loyer').innerText = data.loyer;
+                document.getElementById('last-brute').innerText = data.brute;
+                document.getElementById('last-nette').innerText = data.nette;
+                document.getElementById('last-date').innerText = data.date;
+
+                card.style.display = 'block';
+            }
+
+            function deleteCalculation() {
+                localStorage.removeItem('lastImmoCalc');
+                displayLastCalculation();
+            }
+
+            function loadLastCalculation() {
+                const saved = localStorage.getItem('lastImmoCalc');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('v1').value = data.prix;
+                    document.getElementById('v2').value = data.loyer;
+                    calculate();
+                }
+                displayLastCalculation();
+            }
+
+            window.onload = loadLastCalculation;
+        </script>
+
         <footer class="sidebar-footer">
             <div class="footer-text">© 2024 FZen.Control</div>
         </footer>

@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur Freelance - FZen.Control</title>
+    <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
 
 </head>
 
@@ -49,33 +50,129 @@
 
     <div class="container">
         <main class="main-content" id="printable-area">
-            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
-                    style="color: var(--primary);">TJM</span></h1>
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">
+                Calculateur <span style="color: var(--primary);">TJM</span>
+            </h1>
+
             <div class="card">
                 <div class="input-group">
                     <label>Revenu Net Mensuel souhaité (€)</label>
-                    <input type="number" id="v1" value="0" oninput="calculate()">
+                    <input type="number" id="v1" value="0" min="0" step="0.01" oninput="calculate()">
                 </div>
+
                 <div class="input-group">
                     <label>Jours travaillés par mois</label>
-                    <input type="number" id="v2" value="0" oninput="calculate()">
+                    <input type="number" id="v2" value="0" min="1" step="1" oninput="calculate()">
                 </div>
+
                 <div class="result-area">
                     <span id="res-label">TJM (Tarif Journalier Moyen) HT</span>
                     <span class="result-val" id="res-total">0 €</span>
+                    <div id="res-details" style="margin-top:0.5rem; font-size:0.9rem;"></div>
+                </div>
+
+                <div class="input-group">
+                    <button onclick="saveCalculation()"
+                        style="padding: 0.5rem 1rem; background: #5334db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Enregistrer le calcul
+                    </button>
                 </div>
             </div>
-            <script>
-                function calculate() {
-                    const net = parseFloat(document.getElementById('v1').value) || 0;
-                    const jours = parseFloat(document.getElementById('v2').value) || 1;
-                    const tjm = (net * 1.5) / jours; // 1.5 pour couvrir charges + frais
-                    document.getElementById('res-total').innerText = Math.round(tjm) + " €";
+
+            <div class="card" id="last-calc-card" style="display: none; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Dernier calcul enregistré</h2>
+
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <p><strong>Revenu net souhaité :</strong> <span id="last-net">-</span> €</p>
+                    <p><strong>Jours travaillés :</strong> <span id="last-days">-</span></p>
+                    <p><strong>TJM HT :</strong> <span id="last-tjm">-</span> €</p>
+                    <p><strong>Revenu total estimé :</strong> <span id="last-total">-</span> €</p>
+                    <p><strong>Charges estimées :</strong> <span id="last-charges">-</span> €</p>
+                    <p><strong>Date :</strong> <span id="last-date">-</span></p>
+                </div>
+
+                <button onclick="deleteCalculation()"
+                    style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Supprimer
+                </button>
+            </div>
+        </main>
+
+        <script>
+            function calculate() {
+                const netMensuel = parseFloat(document.getElementById('v1').value) || 0;
+                const jours = parseFloat(document.getElementById('v2').value) || 1;
+
+                // TJM = net mensuel + 50% pour couvrir charges/frais
+                const tjmHT = (netMensuel * 1.5) / jours;
+                const charges = tjmHT * jours - netMensuel;
+                const total = netMensuel + charges;
+
+                document.getElementById('res-total').innerText = Math.round(tjmHT) + " €";
+                document.getElementById('res-details').innerHTML = `
+        Charges estimées : ${charges.toFixed(2)} €<br>
+        Revenu total estimé : ${total.toFixed(2)} €
+    `;
+            }
+
+            function saveCalculation() {
+                const netMensuel = parseFloat(document.getElementById('v1').value) || 0;
+                const jours = parseFloat(document.getElementById('v2').value) || 1;
+                const tjmHT = (netMensuel * 1.5) / jours;
+                const charges = tjmHT * jours - netMensuel;
+                const total = netMensuel + charges;
+
+                localStorage.setItem('lastTJMCalculation', JSON.stringify({
+                    netMensuel: netMensuel.toFixed(2),
+                    jours: jours,
+                    tjmHT: tjmHT.toFixed(2),
+                    charges: charges.toFixed(2),
+                    total: total.toFixed(2),
+                    date: new Date().toLocaleString()
+                }));
+
+                displayLastCalculation();
+            }
+
+            function displayLastCalculation() {
+                const saved = localStorage.getItem('lastTJMCalculation');
+                const card = document.getElementById('last-calc-card');
+
+                if (!saved) {
+                    card.style.display = 'none';
+                    return;
                 }
 
-            </script>
+                const data = JSON.parse(saved);
+                document.getElementById('last-net').innerText = data.netMensuel;
+                document.getElementById('last-days').innerText = data.jours;
+                document.getElementById('last-tjm').innerText = data.tjmHT;
+                document.getElementById('last-charges').innerText = data.charges;
+                document.getElementById('last-total').innerText = data.total;
+                document.getElementById('last-date').innerText = data.date;
 
-        </main>
+                card.style.display = 'block';
+            }
+
+            function deleteCalculation() {
+                localStorage.removeItem('lastTJMCalculation');
+                displayLastCalculation();
+            }
+
+            function loadLastCalculation() {
+                const saved = localStorage.getItem('lastTJMCalculation');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('v1').value = data.netMensuel;
+                    document.getElementById('v2').value = data.jours;
+                    calculate();
+                }
+                displayLastCalculation();
+            }
+
+            window.onload = loadLastCalculation;
+        </script>
+
         <footer class="sidebar-footer">
             <div class="footer-text">© 2024 FZen.Control</div>
         </footer>

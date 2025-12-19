@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur Freelance - FZen.Control</title>
+    <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
 
 </head>
 
@@ -50,32 +51,108 @@
 
     <div class="container">
         <main class="main-content" id="printable-area">
-            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">Calculateur <span
-                    style="color: var(--primary);">Coût de Santé & Mutuelle Annuel</span></h1>
+            <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2.5rem;">
+                Calculateur <span style="color: var(--primary);">Coût de Santé & Mutuelle Annuel</span>
+            </h1>
+
             <div class="card">
-                <div class="input-group"><label>Cotisation mensuelle (€)</label><input type="number" id="v1" value="0"
-                        oninput="calculate()"></div>
-                <div class="input-group"><label>Frais médicaux annuels prévus (€)</label><input type="number" id="v2"
-                        value="0" oninput="calculate()"></div>
+                <div class="input-group">
+                    <label>Cotisation mensuelle (€)</label>
+                    <input type="number" id="v1" value="0" min="0" step="0.01" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label>Frais médicaux annuels prévus (€)</label>
+                    <input type="number" id="v2" value="0" min="0" step="0.01" oninput="calculate()">
+                </div>
+
                 <div class="result-area">
                     <span id="res-label">Coût annuel réel estimé</span>
                     <span class="result-val" id="res-total">0 €</span>
+                    <div id="res-details" style="margin-top:0.5rem; font-size:0.9rem;"></div>
+                </div>
+
+                <div class="input-group">
+                    <button onclick="saveCalculation()"
+                        style="padding: 0.5rem 1rem; background: #5334db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Enregistrer le calcul
+                    </button>
                 </div>
             </div>
-            <script>
-                function calculate() {
-                    const cotis = parseFloat(document.getElementById('v1').value) || 0;
-                    const frais = parseFloat(document.getElementById('v2').value) || 0;
-                    const total = (cotis * 12) + (frais * 0.15); // Estimation 15% reste à charge
-                    document.getElementById('res-total').innerText = Math.round(total).toLocaleString() + " €";
-                }
-            </script>
 
+            <div class="card" id="last-calc-card" style="display: none; margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Dernier calcul enregistré</h2>
+
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <p><strong>Cotisation mensuelle :</strong> <span id="last-cotis">-</span> €</p>
+                    <p><strong>Frais médicaux annuels :</strong> <span id="last-frais">-</span> €</p>
+                    <p><strong>Coût annuel cotisations :</strong> <span id="last-total-cotis">-</span> €</p>
+                    <p><strong>Reste à charge estimé :</strong> <span id="last-reste">-</span> €</p>
+                    <p><strong>Coût annuel total estimé :</strong> <span id="last-total">-</span> €</p>
+                    <p><strong>Date :</strong> <span id="last-date">-</span></p>
+                </div>
+
+                <button onclick="deleteCalculation()"
+                    style="padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Supprimer
+                </button>
+            </div>
         </main>
-        <footer class="sidebar-footer">
-            <div class="footer-text">© 2024 FZen.Control</div>
-        </footer>
-    </div>
-</body>
 
-</html>
+        <script>
+            function calculate() {
+                const cotis = parseFloat(document.getElementById('v1').value) || 0;
+                const frais = parseFloat(document.getElementById('v2').value) || 0;
+
+                const totalCotis = cotis * 12;
+                const resteCharge = frais * 0.15; // 15% reste à charge
+                const total = totalCotis + resteCharge;
+
+                document.getElementById('res-total').innerText = Math.round(total).toLocaleString() + " €";
+                document.getElementById('res-details').innerHTML = `
+        Cotisations annuelles : ${totalCotis.toFixed(2)} €<br>
+        Reste à charge estimé : ${resteCharge.toFixed(2)} €
+    `;
+            }
+
+            function saveCalculation() {
+                const cotis = parseFloat(document.getElementById('v1').value) || 0;
+                const frais = parseFloat(document.getElementById('v2').value) || 0;
+
+                const totalCotis = cotis * 12;
+                const resteCharge = frais * 0.15;
+                const total = totalCotis + resteCharge;
+
+                localStorage.setItem('lastHealthCalc', JSON.stringify({
+                    cotis: cotis.toFixed(2),
+                    frais: frais.toFixed(2),
+                    totalCotis: totalCotis.toFixed(2),
+                    resteCharge: resteCharge.toFixed(2),
+                    total: total.toFixed(2),
+                    date: new Date().toLocaleString()
+                }));
+
+                displayLastCalculation();
+            }
+
+            function displayLastCalculation() {
+                const saved = localStorage.getItem('lastHealthCalc');
+                const card = document.getElementById('last-calc-card');
+
+                if (!saved) {
+                    card.style.display = 'none';
+                    return;
+                }
+
+                const data = JSON.parse(saved);
+
+                document.getElementById('last-cotis').innerText = data.cotis;
+                document.getElementById('last-frais').innerText = data.fra
+
+                    < footer class="sidebar-footer" >
+                        <div class="footer-text">© 2024 FZen.Control</div>
+        </footer >
+    </div >
+</body >
+
+</html >
