@@ -83,7 +83,7 @@ nav a {
     min-height: 80vh;
     display: flex;
     flex-direction: column;
-    
+
 }
 
 main {
@@ -93,7 +93,7 @@ main {
 .main-content {
     max-width: 700px;
     margin: auto;
-    
+
 }
 
 h1 {
@@ -201,95 +201,157 @@ select:focus {
     font-weight: 600;
 }
 
+/* =========================
+   SEO TEXT BLOCK
+   ========================= */
+
+.seo-text {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.08);
+    line-height: 1.7;
+}
+
+.seo-text h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.seo-text p {
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+/* Small emphasis text */
+.seo-text strong {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Optional list support */
+.seo-text ul {
+    padding-left: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.seo-text ul li {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .seo-text {
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .seo-text h2 {
+        font-size: 1.2rem;
+    }
+
+    .seo-text p {
+        font-size: 0.9rem;
+    }
+}
+
 
 @media (max-width: 768px) {
-  
-
-nav a {
-    text-decoration: none;
-}
 
 
+    nav a {
+        text-decoration: none;
+    }
 
-.nav-group {
-    margin-bottom: 25px;
 
-}
 
-.nav-label {
-    font-size: 0.7rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    color: var(--text-light);
-    margin-bottom: 5px;
-    padding-left: 5px;
-    letter-spacing: 1px;
-}
+    .nav-group {
+        margin-bottom: 25px;
 
-.nav-item {
-    
-    padding: 5px 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    color: var(--text-light);
-    font-size: 0.85rem;
-    font-weight: 400;
-    transition: 0.2s;
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+    }
 
-.nav-item:hover {
-    background: var(--primary-light);
-    color: var(--primary);
-}
+    .nav-label {
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        color: var(--text-light);
+        margin-bottom: 5px;
+        padding-left: 5px;
+        letter-spacing: 1px;
+    }
 
-.nav-item.active {
-    background: var(--primary);
-    color: white;
-    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
-}
-nav {
-    width: 100vw;
-    height: auto;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 10px 10px;
-    display: grid;
-    gap: 20px;
-    flex-wrap: wrap;
-    overflow-y: visible;
-}
-img {
+    .nav-item {
 
-    width: 120px;
-    height: auto;
-    margin-bottom: 0;
-}
-.nav-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 0;
-}
+        padding: 5px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        color: var(--text-light);
+        font-size: 0.85rem;
+        font-weight: 400;
+        transition: 0.2s;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-.nav-label {
-    display: none;
-}
+    .nav-item:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
 
-.nav-item {
-    padding: 8px 16px;
-    margin-bottom: 0;
-    font-size: 0.85rem;
-}
+    .nav-item.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+    }
 
- 
+    nav {
+        width: 100vw;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 10px 10px;
+        display: grid;
+        gap: 20px;
+        flex-wrap: wrap;
+        overflow-y: visible;
+    }
+
+    img {
+
+        width: 120px;
+        height: auto;
+        margin-bottom: 0;
+    }
+
+    .nav-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 0;
+    }
+
+    .nav-label {
+        display: none;
+    }
+
+    .nav-item {
+        padding: 8px 16px;
+        margin-bottom: 0;
+        font-size: 0.85rem;
+    }
+
+
 
     .container {
         margin-left: 0;
-        padding: 20px;  
+        padding: 20px;
         min-height: auto;
     }
 }
