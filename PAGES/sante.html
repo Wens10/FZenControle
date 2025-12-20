@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Calculateur - FZen.Control</title>
     <link rel="stylesheet" href="/CSS/style.css">
     <link rel="icon" type="image/x-icon" href="/IMAGES/Capture d'écran 2025-12-18 155640.png">
@@ -147,12 +149,54 @@
                 const data = JSON.parse(saved);
 
                 document.getElementById('last-cotis').innerText = data.cotis;
-                document.getElementById('last-frais').innerText = data.fra
+                document.getElementById('last-frais').innerText = data.frais;
+                document.getElementById('last-total-cotis').innerText = data.totalCotis;
+                document.getElementById('last-reste').innerText = data.resteCharge;
+                document.getElementById('last-total').innerText = data.total;
+                document.getElementById('last-date').innerText = data.date;
 
-                    < footer class="sidebar-footer" >
-                        <div class="footer-text">© 2024 FZen.Control</div>
-        </footer >
-    </div >
-</body >
+                card.style.display = 'block';
+            }
 
-</html >
+            function deleteCalculation() {
+                localStorage.removeItem('lastHealthCalc');
+                displayLastCalculation();
+            }
+
+            function loadLastCalculation() {
+                const saved = localStorage.getItem('lastHealthCalc');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.getElementById('v1').value = data.cotis;
+                    document.getElementById('v2').value = data.frais;
+                    calculate();
+                }
+                displayLastCalculation();
+            }
+
+            window.onload = loadLastCalculation;
+        </script>
+
+        <footer class="sidebar-footer">
+            <div class="footer-text">© 2025 FZen.Control– Simulations financières à titre indicatif</div> 
+            <br>
+            <a href="/PAGES/Mentions.html">Mentions légales</a> 
+            <a href="/PAGES/CGU.html">CGU</a>
+            <style>
+                .sidebar-footer a {
+                    color: #6f1d70;
+                    margin: 0 10px;
+                    text-decoration: none;
+                }
+
+                .sidebar-footer a:hover {
+                    text-decoration: underline;
+                }
+            </style>
+        </footer>
+
+
+    </div>
+</body>
+
+</html>
